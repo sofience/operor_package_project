@@ -244,3 +244,118 @@ def compute_delta_phi_vector(
         "magnitude": magnitude,
         "severity": severity,
     }
+
+
+# ---------------------------------------------------------------------------
+# Δφ Interpretation Layer (H_S / H_M / H_T / H)
+# ---------------------------------------------------------------------------
+
+def interpret_subject(delta_phi_t: PhaseVector) -> str:
+    """
+    H_S: 단일 시점 Δφ → '주체 역할' 라벨.
+
+    - stable / low  : observer / maintainer 계열
+    - medium        : explorer (탐색/전환 중)
+    - high          : reframer (해석/전략 재구성 시도)
+    """
+    severity = str(delta_phi_t.get("severity", "stable"))
+    magnitude = float(delta_phi_t.get("magnitude", 0.0))
+
+    if severity == "stable" and magnitude < 0.1:
+        return "observer"
+    if severity in ("stable", "low") and magnitude < 0.4:
+        return "maintainer"
+    if severity == "medium":
+        return "explorer"
+    if severity == "high":
+        return "reframer"
+    return "unknown"
+
+
+def interpret_memory(delta_phi_history: List[PhaseVector]) -> Dict[str, float]:
+    """
+    H_M: Δφ 시퀀스 → 메모리 요약 벡터.
+
+    - avg_magnitude       : 변화율 평균 (가중 이동 평균)
+    - high_severity_ratio : high 구간 비율
+    - history_len         : 사용된 히스토리 길이
+    """
+    if not delta_phi_history:
+        return {"avg_magnitude": 0.0, "high_severity_ratio": 0.0, "history_len": 0.0}
+
+    # 최근일수록 더 큰 가중치를 주는 decay 기반 요약
+    lam = 0.15
+    num_mag = 0.0
+    den_mag = 0.0
+    high_count = 0
+    total = len(delta_phi_history)
+
+    for age, dphi in enumerate(reversed(delta_phi_history)):
+        w = math.exp(-lam * age)
+        mag = float(dphi.get("magnitude", 0.0))
+        num_mag += w * mag
+        den_mag += w
+        if str(dphi.get("severity", "")) == "high":
+            high_count += 1
+
+    avg_mag = num_mag / (den_mag + 1e-8)
+    high_ratio = high_count / float(total)
+
+    return {
+        "avg_magnitude": max(0.0, min(1.0, avg_mag)),
+        "high_severity_ratio": max(0.0, min(1.0, high_ratio)),
+        "history_len": float(total),
+    }
+
+
+def interpret_time(delta_phi_history: List[PhaseVector]) -> float:
+    """
+    H_T: Δφ 시퀀스 → '체감 시간' 스칼라.
+
+    - Δφ가 클수록 시간이 더 '길게' 느껴지는 모델
+    - 단순히 인덱스를 가중 평균으로 변환
+    """
+    if not delta_phi_history:
+        return 0.0
+
+    num = 0.0
+    den = 0.0
+    for t, dphi in enumerate(delta_phi_history):
+        mag = float(dphi.get("magnitude", 0.0))
+        # 최소한의 가중치 확보
+        g = 0.1 + mag
+        num += t * g
+        den += g
+
+    return num / (den + 1e-8)
+
+
+def interpret_delta_phi_history(delta_phi_history: List[PhaseVector]) -> Dict[str, Any]:
+    """
+    H: Δφ 히스토리 전체에 대한 해석 레이어 집계.
+
+    반환:
+        {
+            "S": str   # 현재 주체 역할
+            "M": dict  # 메모리 요약 벡터
+            "T": float # 체감 시간 인덱스
+        }
+
+    - 순수 함수이며, 전역 상태에 의존하지 않는다.
+    - runtime.trace_log에서 delta_phi_vec만 뽑아서 바로 적용 가능.
+    """
+    if not delta_phi_history:
+        return {"S": "unknown", "M": {"avg_magnitude": 0.0,
+                                      "high_severity_ratio": 0.0,
+                                      "history_len": 0.0},
+                "T": 0.0}
+
+    subject = interpret_subject(delta_phi_history[-1])
+    memory_vec = interpret_memory(delta_phi_history)
+    perceived_time = interpret_time(delta_phi_history)
+
+    return {
+        "S": subject,
+        "M": memory_vec,
+        "T": perceived_time,
+    }
