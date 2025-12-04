@@ -1,4 +1,4 @@
-sofi_context.py — Context / Goal / Plan / Alignment
+"""sofi_context.py — Context / Goal / Plan / Alignment
 
 역할:
 - Context, Goal, PlanCandidate, ScoredPlan
