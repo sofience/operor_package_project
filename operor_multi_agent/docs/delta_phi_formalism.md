@@ -1,7 +1,3 @@
-아래는 Operor Engine 공식 문서용 포맷으로 작성한
-docs/delta_phi_formalism.md 완성본이다.
-그대로 저장해도 되고, README에서 링크만 걸어도 된다.
-
 
 ---
 
