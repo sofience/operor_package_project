@@ -1,4 +1,4 @@
-sofi_agent.py — Orchestrator (agent_step / recursive alignment)
+# sofi_agent.py — Orchestrator (agent_step / recursive alignment)
 
 역할:
 - agent_step: 단일 턴 실행 진입점
