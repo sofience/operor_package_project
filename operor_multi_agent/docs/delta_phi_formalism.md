@@ -279,3 +279,13 @@ PhaseState(t)
 ```
 
 ---
+
+11. 예시 Δφ 계산
+
+```python
+Δφ_core = 0.42
+Δφ_surface = 0.18
+R(t) = 0.05
+Δφ = (0.42 + 0.18) - 0.05 = 0.55
+severity = 0.55 → alignment re-check
+```
