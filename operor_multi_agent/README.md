@@ -1,1 +1,7 @@
-테스트 중
+```python
+User ─→ CLI/Channel ─→ Agent ─→ LLM Backend
+                       │
+                       ├─ Policy Layer
+                       ├─ Δφ Topology Engine
+                       └─ Trace/Runtime
+```
