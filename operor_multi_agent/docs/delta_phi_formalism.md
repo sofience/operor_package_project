@@ -289,3 +289,39 @@ R(t) = 0.05
 Δφ = (0.42 + 0.18) - 0.05 = 0.55
 severity = 0.55 → alignment re-check
 ```
+
+---
+
+12. H(Δφ)(해석 레이어)
+
+```python 
+def H_S(delta_phi_t):
+    # Δφ → 주체 레이블
+    scores = subject_classifier(delta_phi_t)  # e.g. linear / MLP / rule
+    return argmax_label(scores)
+
+def H_M(delta_phi_history):
+    # Δφ 시퀀스 → 메모리 벡터
+    M = 0
+    for age, dphi in enumerate(reversed(delta_phi_history)):
+        w = decay(age)
+        M += w * encode_memory(dphi)
+    return M
+
+def H_T(delta_phi_history):
+    # Δφ 강도 기반 "체감 시간"
+    num = 0.0
+    den = 0.0
+    for t, dphi in enumerate(delta_phi_history):
+        g = time_weight(norm(dphi))
+        num += t * g
+        den += g
+    return num / (den + 1e-8)
+
+def H(delta_phi_history):
+    return {
+        "S": H_S(delta_phi_history[-1]),
+        "M": H_M(delta_phi_history),
+        "T": H_T(delta_phi_history),
+    }
+```
