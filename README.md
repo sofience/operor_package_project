@@ -1,3 +1,11 @@
+```python
+User ─→ CLI/Channel ─→ Agent ─→ LLM Backend
+                       │
+                       ├─ Policy Layer
+                       ├─ Δφ Topology Engine
+                       └─ Trace/Runtime
+```
+
 🚀 Operor Multi-Agent Package
 
 Delta-phi Topology × Multi-Channel Runtime Architecture
