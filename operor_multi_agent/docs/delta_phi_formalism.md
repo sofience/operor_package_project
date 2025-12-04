@@ -257,9 +257,9 @@ OperorRuntime은 Δφ를 지속적으로 저장하여
 
 ---
 
-```python 
 10. Appendix: Δφ Formalism 요약 도식
 
+```python
 PhaseState(t)
               │
               ▼
