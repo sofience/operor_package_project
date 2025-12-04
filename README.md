@@ -147,11 +147,9 @@ Valid output from each agent
 Example CI output:
 
 ```python 
-============================= test session starts =============================
-collected 4 items
-
-tests/test_agent_step.py ....
-============================== 4 passed in 0.04s ==============================
+Run pytest -q --disable-warnings --maxfail=1
+....s....                                                                [100%]
+8 passed, 1 skipped in 0.48s
 ```
 
 ---
