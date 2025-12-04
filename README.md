@@ -1,3 +1,6 @@
+
+✨ “Operor: See Thought.”
+
 ```python
 User ─→ CLI/Channel ─→ Agent ─→ LLM Backend
                        │
